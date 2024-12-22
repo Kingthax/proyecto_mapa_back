@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil Gasfiter</title>
+  <script>
+    async function fetchCitas() {
+      try {
+        const response = await fetch('/api/citas');
+        const citas = await response.json();
+        const container = document.getElementById('citas-list');
+        container.innerHTML = citas
+          .map((c) => `<p>ID: ${c.idCitas} - Usuario: ${c.idUsuario} - Gasfiter: ${c.idgasfiter} - Fecha: ${c.Fecha} - Estado: ${c.Estado}</p>`)
+          .join('');
+      } catch (error) {
+        console.error('Error al obtener citas:', error);
+      }
+    }
+
+    async function addCita() {
+      const idUsuario = document.getElementById('idUsuario').value;
+      const idgasfiter = document.getElementById('idgasfiter').value;
+      const Fecha = document.getElementById('Fecha').value;
+      const Estado = document.getElementById('Estado').value;
+
+      try {
+        const response = await fetch('/api/citas/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ idUsuario, idgasfiter, Fecha, Estado }),
+        });
+
+        const result = await response.json();
+        alert(result.message);
+        fetchCitas(); // Actualizar la lista
+      } catch (error) {
+        console.error('Error al agregar cita:', error);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h1>Gestión de Citas</h1>
+  <h2>Agregar Cita</h2>
+  <input type="text" id="idUsuario" placeholder="ID Usuario">
+  <input type="text" id="idgasfiter" placeholder="ID Gasfiter">
+  <input type="datetime-local" id="Fecha">
+  <select id="Estado">
+    <option value="pending">Pendiente</option>
+    <option value="confirmed">Confirmada</option>
+  </select>
+  <button onclick="addCita()">Agregar</button>
+
+  <h2>Lista de Citas</h2>
+  <div id="citas-list"></div>
+  <button onclick="fetchCitas()">Cargar Citas</button>
+</body>
+</html>
+
